@@ -9,7 +9,7 @@ def get_fulltime():
     else:
         str_month = "{}".format(num_month)
 
-    if num_day = < 10:
+    if num_day <= 10:
         str_day = "0{}".format(num_day)
     else:
         str_day = "{}".format(num_day)
@@ -32,18 +32,21 @@ class TimeManager:
     
     def start(self, name, print_msg = False):
         if name in self.starts.keys() and print_msg:
-            print("{} exists, overwriting time".format(name))
+            print("TimeManager_start: {} exists, overwriting time".format(name))
         self.starts[name] = time.time()
 
     def check(self, name, renew = True, print_msg = False):
         if name not in self.starts.keys():
-            print("!! {} not started !!".format(name))
+            print("ERROR - TimeManager_check: !! {} not started !!".format(name))
             return -1
 
         if name not in self.stats.keys():
             self.stats[name] = list()
 
-        res_check = time.time() - self.starts[name]
+        time_chk = time.time()
+        res_check = time_chk - self.starts[name]
+        if renew: self.starts[name] = time_chk
+
         self.stats[name].append(res_check)
 
         return res_check

@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
+import numpy as np
 import glob
 
-def save_plot(self, name, path, print_msg = True):
+def save_plot(name, path, print_msg = True):
     list_plots = glob.glob(path + "*.png")
     for n_pl in list_plots:
         if name == n_pl[:-4]:
@@ -24,7 +25,7 @@ def draw_plot(x, y, title = "plot", xlabel = "x axis", ylabel = "y axis", legend
     x_len = np.max(x) - np.min(x)
     y_len = np.max(y) - np.min(y)
 
-    plt.clear()
+    plt.close()
     plt.title(title)
     plt.axis([np.min(x) - coef_margin * x_len, np.max(x) + coef_margin * x_len, \
             np.min(y) - coef_margin * y_len, np.max(y) + coef_margin * y_len])
