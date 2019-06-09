@@ -1,20 +1,40 @@
-import os, time, glob, json
-import numpy
+import os, time, glob, json, shutil
+import numpy as np
 from lib.plotting import *
-from lib.manage_dir import *
 from lib.time import *
+from lib.manage_dir import *
+from lib.manage_name import *
+
+from data.DataManager import *
+
 import configparser
+
+name_config_exp = 'config_experiment.ini'
+name_config_data = 'config_data.ini'
+name_config_model = 'config_model.ini'
+name_config_algorithm = 'config_algorithm.ini'
 
 def parse_configs():
     cfparser = configparser.ConfigParser()
-    cfparser.read('./config_experiment.ini')
+    cfparser.read(name_config_exp)
 
     args = {
+            ### User ###
             'id_user': cfparser['User']['id_user'],
             'comment_experiment': cfparser['User']['comment_experiment'],
+
+            ### Data ###
             'dir_data': cfparser['Data']['dir_data'],
+            'type_learning': cfparser['Data']['type_learning'],
+            'name_data' : cfparser['Data']['name_data'],
+
+            ### Model ###
             'dir_model': cfparser['Model']['dir_model'],
-            'dir_algorithm': cfparser['Model']['dir_algorithm'],
+
+            ### Algorithm ###
+            'dir_algorithm': cfparser['Algorithm']['dir_algorithm'],
+
+            ### Results ###
             'dir_results': cfparser['Results']['dir_results'],
             'dir_plots': cfparser['Results']['dir_plots'],
             'order_dirname': cfparser['Results']['order_dirname'][1:-1].split(", ")
@@ -53,18 +73,66 @@ def make_dirs(args):
     print("### making directory with name {} ###".format(res_dirname))
 	
     try:
-        make_dir(args['dir_results'] + res_dirname + "/" + args['dir_plots'])
+        args['dir_results'] += res_dirname + "/"
+        make_dir(args['dir_results'] + args['dir_plots'])
         return True
     except:
         print("ERROR - make_dirs: failed to make directory {}".format(res_dirname))
-        return False
+        raise
 
+def save_configs(args):
+    dir_configs = args['dir_results'] + "configs/" 
+    try:
+        make_dir(dir_configs)
+        shutil.copyfile(name_config_exp, manage_file_dup(name_config_exp, dir_configs))
+        shutil.copyfile(args['dir_data'] + name_config_data, manage_file_dup(name_config_data, dir_configs))
+        shutil.copyfile(args['dir_model'] + name_config_model, manage_file_dup(name_config_model, dir_configs))
+        shutil.copyfile(args['dir_algorithm'] + name_config_algorithm, manage_file_dup(name_config_algorithm, dir_configs))
+    except:
+        raise
+
+def load_data(args):
+    dm = DataManager(args['type_learning'], args['name_data'])
+
+    if args['type_learning'][:2] == 'RL':
+        return dm.get_env()
+    elif args['type_learning'][:2] == 'SL':
+        return dm
+
+def load_model(args):
+    mm = None # ModelManager
+    return mm
+
+def execute_algorithm(args, dm, mm):
+    return False
 
 def main():
-    print("\n@@@@@ start code @@@@@\n")
+    print("\n@@@@@ experiment.py: start code @@@@@\n")
+
+    tm = TimeManager()
+    tm.start('experiment_whole')
+
     args = parse_configs()
-    res_mkdir = make_dirs(args)
-    print("\n@@@@@ end code @@@@@\n")
+
+    assert make_dirs(args)
+    save_configs(args)
+
+    tm.start('load_data')
+    dm = load_data(args)
+    tm.check('load_data')
+
+    tm.start('load_model')
+    mm = load_model(args)
+    tm.check('load_model')
+
+    tm.start('execute_algorithm')
+    res_alg = execute_algorithm(args, dm, mm)
+    tm.check('execute_algorithm')
+
+    tm.check('experiment_whole')
+
+    print("\n@@@@@ experiment.py: end code @@@@@\n")
+    print(tm.get_stat_whole())
 
 main()
     

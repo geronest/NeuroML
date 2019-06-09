@@ -51,4 +51,14 @@ class TimeManager:
 
         return res_check
 
+    def get_stat(self, name, idx = None):
+        if idx:
+            return self.stats[name][idx]
+        else:
+            return self.stats[name]
+
+    def get_stat_whole(self):
+        return self.stats
+
+
 
