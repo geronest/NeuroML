@@ -39,6 +39,7 @@ def parse_configs():
             'dir_results': cfparser['Results']['dir_results'],
             'res_plots': 'plots/',
             'res_model': 'model/', 
+            'res_algorithm': 'algorithm/', 
             'res_configs': 'configs/',
             'order_dirname': cfparser['Results']['order_dirname'][1:-1].split(", ")
             }

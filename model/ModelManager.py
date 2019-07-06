@@ -8,23 +8,25 @@ TODO
 import model.testnn1.testnn1 as tn1
 
 import lib.manage_dir as md
+from lib.manage_args import *
 import os
 import torch
 
 mdict = { # model dict?
-			'tn1' = tn1.Model
+			'testnn1' = tn1.Model
 		}
 
 name_config_model = './model/config_model.ini'
 
 
-def parse_configs():
+def parse_configs(name):
     cfparser = configparser.ConfigParser()
     cfparser.read(name_config_model)
 
-    args = {
-            # TODO: fill!
-            }
+    args = cfparser[name]
+    split_dims = args['dims'][1:-1].split(",")
+    args['dims'] = list()
+    for dim in split_dims: args['dims'].append(int(dim))
 
     return args
 
@@ -34,12 +36,14 @@ class ModelManager:
 		self.models = dict()
 		self.dir_model = args_exp['dir_results'] + args_exp['res_model']
 		self.dirs = dict()
+		self.args_mm = parse_configs()
 
-	def new_model(self, name, args_mdefine):
+	def new_model(self, name, args_mdefine = {}):
+		args_m = overwrite_args(self.args_mm, args_mdefine)
 		if name not in self.models.keys():
 			self.models[name] = list()
 			self.dirs[name] = self.dir_model + name + '/'
-		self.models[name].append(mdict[name](args_mdefine))
+		self.models[name].append(mdict[name](args_m))
 
 		return self.models[name][-1]
 
@@ -50,8 +54,9 @@ class ModelManager:
 		md.make_dir(self.dirs[name] + path)
 		torch.save(self.models[name][idx].state_dict(), self.dirs[name] + path)
 
-	def load_model(self, name, idx = 0, path = "", args_mdefine):
-		self.models[name][idx] = mdict[name](args_mdefine)
+	def load_model(self, name, idx = 0, path = "", args_mdefine = {}):
+		args_m = overwrite_args(self.args_mm, args_mdefine)
+		self.models[name][idx] = mdict[name](args_m)
 		self.models[name][idx].load_state_dict(torch.load(path))
 		self.models[name][idx].eval()
 
