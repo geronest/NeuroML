@@ -6,6 +6,7 @@ from lib.manage_dir import *
 from lib.manage_name import *
 
 from data.DataManager import *
+from model.ModelManager import *
 
 import configparser
 
@@ -36,7 +37,9 @@ def parse_configs():
 
             ### Results ###
             'dir_results': cfparser['Results']['dir_results'],
-            'dir_plots': cfparser['Results']['dir_plots'],
+            'res_plots': 'plots/',
+            'res_model': 'model/', 
+            'res_configs': 'configs/',
             'order_dirname': cfparser['Results']['order_dirname'][1:-1].split(", ")
             }
 
@@ -74,22 +77,22 @@ def make_dirs(args):
 	
     try:
         args['dir_results'] += res_dirname + "/"
-        make_dir(args['dir_results'] + args['dir_plots'])
+        make_dir(args['dir_results'] + args['res_plots'])
+        make_dir(args['dir_results'] + args['res_model'])
+        make_dir(args['dir_results'] + args['res_configs'])
         return True
-    except:
+    except Exception as e:
         print("ERROR - make_dirs: failed to make directory {}".format(res_dirname))
-        raise
+        raise e
 
 def save_configs(args):
-    dir_configs = args['dir_results'] + "configs/" 
     try:
-        make_dir(dir_configs)
         shutil.copyfile(name_config_exp, manage_file_dup(name_config_exp, dir_configs))
         shutil.copyfile(args['dir_data'] + name_config_data, manage_file_dup(name_config_data, dir_configs))
         shutil.copyfile(args['dir_model'] + name_config_model, manage_file_dup(name_config_model, dir_configs))
         shutil.copyfile(args['dir_algorithm'] + name_config_algorithm, manage_file_dup(name_config_algorithm, dir_configs))
-    except:
-        raise
+    except Exception as e:
+        raise e
 
 def load_data(args):
     dm = DataManager(args['type_learning'], args['name_data'])
@@ -100,7 +103,7 @@ def load_data(args):
         return dm
 
 def load_model(args):
-    mm = None # ModelManager
+    mm = ModelManager(args) # ModelManager
     return mm
 
 def execute_algorithm(args, dm, mm):
