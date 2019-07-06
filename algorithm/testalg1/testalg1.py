@@ -23,7 +23,7 @@ class Algorithm:
 
 	def init_train(self):
 		self.idx_train = 0
-		self.model = self.mm.new_model('tn1') ## ??????? -> do I need to pass args for initializing models here? or was it supposed to be done inside ModelManager?
+		self.model = self.mm.new_model('tn1') ## TODO: needs to pass dimensions according to input and output of data!!
 		self.optimizer = torch.optim.SGD(self.model.parameters(), lr = 1e-4, momentum = 0.9)
 		self.report("init_train complete")
 
@@ -48,6 +48,8 @@ class Algorithm:
 			self.report("iteration {}, loss {}".format(self.idx_train, loss.item()))
 
 	def run_train(self, idx_terminate = 10000):
+		# TODO: implement!!
+		pass
 		
 
 
