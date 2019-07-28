@@ -7,6 +7,7 @@ from lib.manage_name import *
 
 from data.DataManager import *
 from model.ModelManager import *
+from algorithm.AlgorithmManager import *
 
 import configparser
 
@@ -31,9 +32,11 @@ def parse_configs():
 
             ### Model ###
             'dir_model': cfparser['Model']['dir_model'],
+            'name_model': cfparser['Model']['name_model'],
 
             ### Algorithm ###
             'dir_algorithm': cfparser['Algorithm']['dir_algorithm'],
+            'name_algorithm': cfparser['Algorithm']['name_algorithm'],
 
             ### Results ###
             'dir_results': cfparser['Results']['dir_results'],
@@ -81,12 +84,14 @@ def make_dirs(args):
         make_dir(args['dir_results'] + args['res_plots'])
         make_dir(args['dir_results'] + args['res_model'])
         make_dir(args['dir_results'] + args['res_configs'])
+        make_dir(args['dir_results'] + args['res_algorithm'])
         return True
     except Exception as e:
         print("ERROR - make_dirs: failed to make directory {}".format(res_dirname))
         raise e
 
 def save_configs(args):
+    dir_configs = args['dir_results'] + args['res_configs']
     try:
         shutil.copyfile(name_config_exp, manage_file_dup(name_config_exp, dir_configs))
         shutil.copyfile(args['dir_data'] + name_config_data, manage_file_dup(name_config_data, dir_configs))
@@ -108,6 +113,9 @@ def load_model(args):
     return mm
 
 def execute_algorithm(args, dm, mm):
+    am = AlgorithmManager(args, dm, mm)
+    am.new_algorithm(args['name_algorithm'])
+    am.run_algorithm(args['name_algorithm'])
     return False
 
 def main():

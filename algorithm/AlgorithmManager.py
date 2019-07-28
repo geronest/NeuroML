@@ -3,7 +3,8 @@ TODO
 	
 '''
 
-import model.testalg1.testalg1 as ta1
+import algorithm.testalg1.testalg1 as ta1
+import configparser
 
 import lib.manage_dir as md
 from lib.manage_args import *
@@ -11,7 +12,7 @@ import os
 import torch
 
 adict = { # algorithm dict?
-			'ta1' = ta1.Algorithm
+			'ta1': ta1.Algorithm
 		}
 
 name_config_alg = './algorithm/config_algorithm.ini'
@@ -42,6 +43,7 @@ class AlgorithmManager:
 		if name not in self.algs.keys():
 			self.algs[name] = list()
 			self.dirs[name] = self.dir_alg + name + '/'
+			md.make_dir(self.dirs[name])
 		self.algs[name].append(adict[name](args_a, self.dirs[name], self.dm, self.mm))
 		self.algs[name][-1].init_train()
 
@@ -58,7 +60,7 @@ class AlgorithmManager:
 		args_a = overwrite_args(self.args_am, args_adefine)
 		# TODO: load what? model??
 
-	def run_algorithm(self, name, idx):
+	def run_algorithm(self, name, idx = 0):
 		alg = self.algs[name][idx]
 		alg.run_train()
 

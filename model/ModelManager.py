@@ -6,6 +6,7 @@ TODO
 '''
 
 import model.testnn1.testnn1 as tn1
+import configparser
 
 import lib.manage_dir as md
 from lib.manage_args import *
@@ -13,7 +14,7 @@ import os
 import torch
 
 mdict = { # model dict?
-			'testnn1' = tn1.Model
+			'testnn1': tn1.Model
 		}
 
 name_config_model = './model/config_model.ini'
@@ -23,7 +24,9 @@ def parse_configs(name):
     cfparser = configparser.ConfigParser()
     cfparser.read(name_config_model)
 
-    args = cfparser[name]
+    args = dict()
+    for key in cfparser[name]:
+    	args[key] = cfparser[name][key]
     split_dims = args['dims'][1:-1].split(",")
     args['dims'] = list()
     for dim in split_dims: args['dims'].append(int(dim))
@@ -36,7 +39,7 @@ class ModelManager:
 		self.models = dict()
 		self.dir_model = args_exp['dir_results'] + args_exp['res_model']
 		self.dirs = dict()
-		self.args_mm = parse_configs()
+		self.args_mm = parse_configs(args_exp['name_model'])
 
 	def new_model(self, name, args_mdefine = {}):
 		args_m = overwrite_args(self.args_mm, args_mdefine)

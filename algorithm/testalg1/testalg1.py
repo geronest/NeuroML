@@ -1,6 +1,7 @@
 import numpy as np
 import torch
-import libs.manage_name as mn
+import lib.manage_name as mn
+
 
 class Algorithm:
 	def __init__(self, args, dir_alg, dm, mm):
@@ -15,7 +16,7 @@ class Algorithm:
 		self.optimizer = None
 		self.idx_train = 0
 
-		self.file_log = open(manage_file_dup('log_algorithm.txt', self.dir_alg), "a")
+		self.file_log = open(mn.manage_file_dup('log_algorithm.txt', self.dir_alg), "a")
 
 	def report(self, s):
 		print(s)
@@ -23,7 +24,7 @@ class Algorithm:
 
 	def init_train(self):
 		self.idx_train = 0
-		self.model = self.mm.new_model('tn1') ## TODO: needs to pass dimensions according to input and output of data!!
+		self.model = self.mm.new_model('testnn1') ## TODO: needs to pass dimensions according to input and output of data!!
 		self.optimizer = torch.optim.SGD(self.model.parameters(), lr = 1e-4, momentum = 0.9)
 		self.report("init_train complete")
 
